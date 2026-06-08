@@ -12,6 +12,17 @@ This project is student-maintained and independent. It is not an official RWTH
 Aachen University, RWTH IT Center, WestAI, KI:connect.nrw, or NRW university
 service.
 
+## Repository Identity
+
+The public repository and distribution name is `codex-deep-loop-mcp`:
+<https://github.com/Solar-Tim/codex-deep-loop-mcp>.
+
+The Python module remains `codex_rwth_mcp` for compatibility with the initial
+provider-specific implementation. Existing local configs that use the old
+`codex-rwth-mcp` command or `CODEX_RWTH_MCP_*` environment variables still
+work, but new setups should prefer `codex-deep-loop-mcp`,
+`codex_deep_loop`, and `CODEX_DEEP_LOOP_MCP_*`.
+
 ## Provider Terms
 
 You are responsible for using a provider, endpoint, API key, and submitted data
