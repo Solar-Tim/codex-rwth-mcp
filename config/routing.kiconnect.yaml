@@ -1,0 +1,65 @@
+server_name: codex-rwth-mcp
+
+rwth:
+  base_url: https://chat.kiconnect.nrw/api/v1
+  api_key_env: KICONNECT_API_KEY
+  request_timeout_sec: 60
+
+models:
+  cheap_text:
+    id: gpt-oss-120b
+    supports_vision: false
+    max_input_chars: 64000
+    cost_weight: 1.0
+  long_text:
+    id: mistralai-mistral-small-4-119b
+    supports_vision: true
+    max_input_chars: 100000
+    cost_weight: 2.0
+    notes: Vision support still needs a dedicated live screenshot smoke test.
+  vision:
+    id: mistralai-mistral-small-4-119b
+    supports_vision: true
+    max_input_chars: 20000
+    cost_weight: 1.5
+    notes: Vision support still needs a dedicated live screenshot smoke test.
+
+tools:
+  summarize_logs:
+    max_output_tokens: 900
+    temperature: 0.1
+    routes:
+      - model: cheap_text
+        max_input_chars: 64000
+        priority: 10
+      - model: long_text
+        max_input_chars: 100000
+        priority: 20
+  summarize_repo:
+    max_output_tokens: 1200
+    temperature: 0.1
+    routes:
+      - model: cheap_text
+        max_input_chars: 64000
+        priority: 10
+      - model: long_text
+        max_input_chars: 100000
+        priority: 20
+  analyze_screenshot:
+    max_output_tokens: 800
+    temperature: 0.0
+    routes:
+      - model: vision
+        requires_vision: true
+        max_input_chars: 20000
+        priority: 10
+  summarize_diff:
+    max_output_tokens: 1200
+    temperature: 0.1
+    routes:
+      - model: cheap_text
+        max_input_chars: 64000
+        priority: 10
+      - model: long_text
+        max_input_chars: 100000
+        priority: 20

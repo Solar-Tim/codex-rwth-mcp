@@ -12,12 +12,18 @@ University, RWTH IT Center, or WestAI project.
 Read these before using the server:
 
 - RWTH IT Center: [Using Large Language Models](https://help.itc.rwth-aachen.de/en/service/5a9d03f1675f4f85ac9b3fd7bb853d44/article/80525f9e55c443af86d2698d0cbed743/)
+- RWTH IT Center: [RWTHgpt API access announcement](https://www.itc.rwth-aachen.de/go/id/bndrow?lidx=1#aaaaaaaaabndrpc)
 - WestAI: [Large Language Models](https://www.westai.de/services/large-language-models/)
+- KiConnect: [Models API reference](https://chat.kiconnect.nrw/app/api-docs/#tag/models/get/v1models)
 
 The RWTH IT Center docs describe an OpenAI-compatible endpoint at
 `https://llm.hpc.itc.rwth-aachen.de/`, access tokens from the LLM project page,
 model discovery through `/v1/models`, and chat calls through
-`/v1/chat/completions`.
+`/v1/chat/completions`. The KiConnect API reference documents the same
+OpenAI-style model discovery shape under
+`https://chat.kiconnect.nrw/api/v1/models`.
+The RWTHgpt API access announcement lists the student-accessible models used
+by `config/routing.kiconnect.yaml`.
 
 ## What It Does
 
@@ -61,6 +67,30 @@ If your available model IDs differ from the examples, copy
 `config/routing.example.yaml` to `config/routing.local.yaml`, edit the model
 IDs, and set `CODEX_RWTH_MCP_CONFIG` to that local file.
 
+### KiConnect Access
+
+For KiConnect API keys, use the KiConnect routing file:
+
+```bash
+export KICONNECT_API_KEY="paste-your-token"
+export CODEX_RWTH_MCP_CONFIG="$PWD/config/routing.kiconnect.yaml"
+```
+
+The KiConnect API reference documents Bearer authentication and OpenAI-style
+endpoints under `https://chat.kiconnect.nrw/api/v1`. Use the
+[Models API reference](https://chat.kiconnect.nrw/app/api-docs/#tag/models/get/v1models)
+as the source of truth for checking model discovery.
+
+Run a live smoke test:
+
+```bash
+.venv/bin/python scripts/live_smoke.py
+```
+
+The smoke test checks `/models`, verifies the configured model IDs are
+available, constructs the MCP server, and calls `summarize_logs` with a small
+synthetic log snippet.
+
 ## Add To Codex
 
 ```bash
@@ -78,6 +108,14 @@ Or copy the example from `examples/codex.config.toml` into your
 ```bash
 RWTH_OPENAI_API_KEY="$RWTH_OPENAI_API_KEY" \
 CODEX_RWTH_MCP_CONFIG="$PWD/config/routing.yaml" \
+.venv/bin/python -m codex_rwth_mcp
+```
+
+For KiConnect:
+
+```bash
+KICONNECT_API_KEY="$KICONNECT_API_KEY" \
+CODEX_RWTH_MCP_CONFIG="$PWD/config/routing.kiconnect.yaml" \
 .venv/bin/python -m codex_rwth_mcp
 ```
 

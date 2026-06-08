@@ -5,7 +5,9 @@ This project is designed for RWTH's OpenAI-compatible LLM Hosting API.
 ## Official Sources
 
 - RWTH IT Center: [Using Large Language Models](https://help.itc.rwth-aachen.de/en/service/5a9d03f1675f4f85ac9b3fd7bb853d44/article/80525f9e55c443af86d2698d0cbed743/)
+- RWTH IT Center: [RWTHgpt API access announcement](https://www.itc.rwth-aachen.de/go/id/bndrow?lidx=1#aaaaaaaaabndrpc)
 - WestAI: [Large Language Models](https://www.westai.de/services/large-language-models/)
+- KiConnect: [Models API reference](https://chat.kiconnect.nrw/app/api-docs/#tag/models/get/v1models)
 
 ## What The RWTH Docs State
 
@@ -39,6 +41,28 @@ curl -H "Authorization: Bearer $RWTH_OPENAI_API_KEY" \
 
 Then copy the exact model IDs into `config/routing.local.yaml` or
 `config/routing.yaml`.
+
+For KiConnect API keys, the documented model discovery endpoint is:
+
+```bash
+curl -H "Authorization: Bearer $KICONNECT_API_KEY" \
+  https://chat.kiconnect.nrw/api/v1/models
+```
+
+This is grounded in the KiConnect
+[Models API reference](https://chat.kiconnect.nrw/app/api-docs/#tag/models/get/v1models),
+which documents Bearer authentication and `GET /v1/models` under the
+`https://chat.kiconnect.nrw/api` server. The checked-in
+`config/routing.kiconnect.yaml` uses the full OpenAI-compatible base URL
+`https://chat.kiconnect.nrw/api/v1`, so the OpenAI SDK appends
+`/chat/completions` and the smoke script appends `/models`.
+
+The RWTH IT Center
+[RWTHgpt API access announcement](https://www.itc.rwth-aachen.de/go/id/bndrow?lidx=1#aaaaaaaaabndrpc)
+states that student API access is available for `gpt-oss-120b`,
+`e5-mistral-7b-instruct`, `qwen3-embedding-8b`, and
+`mistralai-mistral-small-4-119b`. Those IDs match the KiConnect model list
+observed during the live smoke test.
 
 The checked-in routing examples use documented model IDs from RWTH's public
 examples where possible. If a model is unavailable for your account, replace it
