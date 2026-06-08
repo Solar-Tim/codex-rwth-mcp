@@ -1,4 +1,9 @@
-server_name: codex-rwth-mcp
+server_name: codex-deep-loop-mcp
+
+# Optional allowlist for multi-repo guarded file evidence. Tool inputs may use
+# repo_root: example_repo, but arbitrary absolute paths are rejected.
+# repo_roots:
+#   example_repo: /absolute/path/to/example-repo
 
 rwth:
   base_url: https://llm.hpc.itc.rwth-aachen.de
@@ -89,6 +94,56 @@ tools:
         priority: 20
   repo_map_loop:
     max_output_tokens: 1200
+    temperature: 0.1
+    routes:
+      - model: cheap_text
+        max_input_chars: 64000
+        priority: 10
+      - model: long_text
+        max_input_chars: 100000
+        priority: 20
+  deep_repo_review_loop:
+    max_output_tokens: 1200
+    temperature: 0.1
+    routes:
+      - model: cheap_text
+        max_input_chars: 64000
+        priority: 10
+      - model: long_text
+        max_input_chars: 100000
+        priority: 20
+  deep_test_strategy_loop:
+    max_output_tokens: 1200
+    temperature: 0.1
+    routes:
+      - model: cheap_text
+        max_input_chars: 64000
+        priority: 10
+      - model: long_text
+        max_input_chars: 100000
+        priority: 20
+  deep_architecture_critic:
+    max_output_tokens: 1200
+    temperature: 0.1
+    routes:
+      - model: cheap_text
+        max_input_chars: 64000
+        priority: 10
+      - model: long_text
+        max_input_chars: 100000
+        priority: 20
+  external_repo_scan_loop:
+    max_output_tokens: 1200
+    temperature: 0.1
+    routes:
+      - model: cheap_text
+        max_input_chars: 64000
+        priority: 10
+      - model: long_text
+        max_input_chars: 100000
+        priority: 20
+  coding_task_loop:
+    max_output_tokens: 1600
     temperature: 0.1
     routes:
       - model: cheap_text

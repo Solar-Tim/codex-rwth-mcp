@@ -6,15 +6,8 @@
       "required": ["logs"],
       "additionalProperties": false,
       "properties": {
-        "logs": {
-          "type": "string",
-          "description": "Raw logs, traces, terminal output, or CI output to analyze."
-        },
-        "context": {
-          "type": "string",
-          "description": "Optional context such as service name, time window, recent change, or failing command.",
-          "default": ""
-        }
+        "logs": {"type": "string", "description": "Raw logs, traces, terminal output, or CI output to analyze."},
+        "context": {"type": "string", "description": "Optional context such as service name, time window, recent change, or failing command.", "default": ""}
       }
     }
   },
@@ -25,15 +18,8 @@
       "required": ["files"],
       "additionalProperties": false,
       "properties": {
-        "files": {
-          "type": "string",
-          "description": "Concatenated file excerpts with paths. Include only relevant source, config, and docs."
-        },
-        "question": {
-          "type": "string",
-          "description": "Optional focus question for architecture, flow, ownership, or relevant components.",
-          "default": ""
-        }
+        "files": {"type": "string", "description": "Concatenated file excerpts with paths. Include only relevant source, config, and docs."},
+        "question": {"type": "string", "description": "Optional focus question for architecture, flow, ownership, or relevant components.", "default": ""}
       }
     }
   },
@@ -44,20 +30,9 @@
       "required": ["image_base64"],
       "additionalProperties": false,
       "properties": {
-        "image_base64": {
-          "type": "string",
-          "description": "Base64-encoded screenshot. PNG is preferred for UI, terminal, and browser screenshots."
-        },
-        "mime_type": {
-          "type": "string",
-          "description": "Image MIME type such as image/png or image/jpeg.",
-          "default": "image/png"
-        },
-        "question": {
-          "type": "string",
-          "description": "Optional diagnostic focus, for example visible error, layout issue, or dashboard anomaly.",
-          "default": ""
-        }
+        "image_base64": {"type": "string", "description": "Base64-encoded screenshot. PNG is preferred for UI, terminal, and browser screenshots."},
+        "mime_type": {"type": "string", "description": "Image MIME type such as image/png or image/jpeg.", "default": "image/png"},
+        "question": {"type": "string", "description": "Optional diagnostic focus, for example visible error, layout issue, or dashboard anomaly.", "default": ""}
       }
     }
   },
@@ -68,101 +43,145 @@
       "required": ["diff"],
       "additionalProperties": false,
       "properties": {
-        "diff": {
-          "type": "string",
-          "description": "Unified git diff, PR patch, or copied change set."
-        },
-        "context": {
-          "type": "string",
-          "description": "Optional context such as PR title, issue link, release risk, or review focus.",
-          "default": ""
-        }
+        "diff": {"type": "string", "description": "Unified git diff, PR patch, or copied change set."},
+        "context": {"type": "string", "description": "Optional context such as PR title, issue link, release risk, or review focus.", "default": ""}
       }
     }
   },
   "deep_debug_loop": {
-    "description": "Run a bounded KiConnect debugging loop and return a Codex handoff or evidence requests.",
+    "description": "Run a bounded provider-backed debugging loop and return a Codex handoff or evidence requests.",
     "inputSchema": {
       "type": "object",
       "required": ["logs"],
       "additionalProperties": false,
       "properties": {
-        "logs": {
-          "type": "string",
-          "description": "Logs, traces, terminal output, or CI output to debug."
-        },
-        "context": {
-          "type": "string",
-          "description": "Optional service, repo, recent change, or failure context.",
-          "default": ""
-        },
-        "failing_command": {
-          "type": "string",
-          "description": "Optional command that failed, if known.",
-          "default": ""
-        },
-        "file_paths": {
-          "type": "array",
-          "items": {"type": "string"},
-          "description": "Optional repo-relative file paths for guarded MCP-side evidence loading.",
-          "default": []
-        }
+        "logs": {"type": "string", "description": "Logs, traces, terminal output, or CI output to debug."},
+        "context": {"type": "string", "description": "Optional service, repo, recent change, or failure context.", "default": ""},
+        "failing_command": {"type": "string", "description": "Optional command that failed, if known.", "default": ""},
+        "file_paths": {"type": "array", "items": {"type": "string"}, "description": "Optional repo-relative file paths for guarded MCP-side evidence loading.", "default": []},
+        "repo_root": {"type": "string", "description": "Optional configured repo_roots name for guarded MCP-side evidence loading.", "default": ""},
+        "analysis_depth": {"type": "string", "description": "Optional analysis depth: fast, standard, deep, or exhaustive. Defaults to deep for quality.", "default": "deep", "enum": ["fast", "standard", "deep", "exhaustive"]}
       }
     }
   },
   "deep_diff_review": {
-    "description": "Run a bounded KiConnect diff-review loop with chunking, merge, and critic phases.",
+    "description": "Run a bounded provider-backed diff-review loop with chunking, merge, and critic phases.",
     "inputSchema": {
       "type": "object",
       "required": [],
       "additionalProperties": false,
       "properties": {
-        "diff": {
-          "type": "string",
-          "description": "Unified diff, PR patch, or copied change set.",
-          "default": ""
-        },
-        "context": {
-          "type": "string",
-          "description": "Optional PR title, issue link, release risk, or review focus.",
-          "default": ""
-        },
-        "file_paths": {
-          "type": "array",
-          "items": {"type": "string"},
-          "description": "Optional repo-relative file paths for guarded MCP-side evidence loading.",
-          "default": []
-        }
+        "diff": {"type": "string", "description": "Unified diff, PR patch, or copied change set.", "default": ""},
+        "context": {"type": "string", "description": "Optional PR title, issue link, release risk, or review focus.", "default": ""},
+        "file_paths": {"type": "array", "items": {"type": "string"}, "description": "Optional repo-relative file paths for guarded MCP-side evidence loading.", "default": []},
+        "repo_root": {"type": "string", "description": "Optional configured repo_roots name for guarded MCP-side evidence loading.", "default": ""},
+        "analysis_depth": {"type": "string", "description": "Optional analysis depth: fast, standard, deep, or exhaustive. Defaults to deep for quality.", "default": "deep", "enum": ["fast", "standard", "deep", "exhaustive"]}
       }
     }
   },
   "repo_map_loop": {
-    "description": "Run a bounded KiConnect repository-mapping loop over provided tree and guarded file evidence.",
+    "description": "Run a bounded provider-backed repository-mapping loop over provided tree and guarded file evidence.",
     "inputSchema": {
       "type": "object",
       "required": ["question"],
       "additionalProperties": false,
       "properties": {
-        "question": {
-          "type": "string",
-          "description": "Architecture, ownership, flow, or relevant-file question."
-        },
-        "file_paths": {
-          "type": "array",
-          "items": {"type": "string"},
-          "description": "Optional repo-relative file paths for guarded MCP-side evidence loading.",
-          "default": []
-        },
-        "file_tree": {
-          "type": "string",
-          "description": "Optional file tree or rg --files output.",
-          "default": ""
-        },
-        "context": {
-          "type": "string",
-          "description": "Optional repo or task context.",
-          "default": ""
-        }
+        "question": {"type": "string", "description": "Architecture, ownership, flow, or relevant-file question."},
+        "file_paths": {"type": "array", "items": {"type": "string"}, "description": "Optional repo-relative file paths for guarded MCP-side evidence loading.", "default": []},
+        "file_tree": {"type": "string", "description": "Optional file tree or rg --files output.", "default": ""},
+        "context": {"type": "string", "description": "Optional repo or task context.", "default": ""},
+        "repo_root": {"type": "string", "description": "Optional configured repo_roots name for guarded MCP-side evidence loading.", "default": ""},
+        "analysis_depth": {"type": "string", "description": "Optional analysis depth: fast, standard, deep, or exhaustive. Defaults to deep for quality.", "default": "deep", "enum": ["fast", "standard", "deep", "exhaustive"]}
+      }
+    }
+  },
+  "deep_repo_review_loop": {
+    "description": "Run a bounded provider-backed repository review loop over tree and guarded file evidence.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["question"],
+      "additionalProperties": false,
+      "properties": {
+        "question": {"type": "string", "description": "Repository review question or focus area."},
+        "file_tree": {"type": "string", "description": "Optional file tree or rg --files output.", "default": ""},
+        "context": {"type": "string", "description": "Optional repo or task context.", "default": ""},
+        "file_paths": {"type": "array", "items": {"type": "string"}, "description": "Optional guarded file evidence paths.", "default": []},
+        "repo_root": {"type": "string", "description": "Optional configured repo_roots name.", "default": ""},
+        "analysis_depth": {"type": "string", "description": "Optional analysis depth: fast, standard, deep, or exhaustive. Defaults to deep for quality.", "default": "deep", "enum": ["fast", "standard", "deep", "exhaustive"]}
+      }
+    }
+  },
+  "deep_test_strategy_loop": {
+    "description": "Run a bounded provider-backed loop that proposes focused test strategy for a change.",
+    "inputSchema": {
+      "type": "object",
+      "required": [],
+      "additionalProperties": false,
+      "properties": {
+        "diff": {"type": "string", "description": "Optional diff or change description.", "default": ""},
+        "failing_tests": {"type": "string", "description": "Optional failing test output or known failures.", "default": ""},
+        "context": {"type": "string", "description": "Optional task or repo context.", "default": ""},
+        "file_paths": {"type": "array", "items": {"type": "string"}, "description": "Optional guarded file evidence paths.", "default": []},
+        "repo_root": {"type": "string", "description": "Optional configured repo_roots name.", "default": ""},
+        "analysis_depth": {"type": "string", "description": "Optional analysis depth: fast, standard, deep, or exhaustive. Defaults to deep for quality.", "default": "deep", "enum": ["fast", "standard", "deep", "exhaustive"]}
+      }
+    }
+  },
+  "deep_architecture_critic": {
+    "description": "Run a bounded provider-backed architecture critic loop over guarded evidence.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["question"],
+      "additionalProperties": false,
+      "properties": {
+        "question": {"type": "string", "description": "Architecture risk or design question."},
+        "context": {"type": "string", "description": "Optional repo or task context.", "default": ""},
+        "file_paths": {"type": "array", "items": {"type": "string"}, "description": "Optional guarded file evidence paths.", "default": []},
+        "repo_root": {"type": "string", "description": "Optional configured repo_roots name.", "default": ""},
+        "analysis_depth": {"type": "string", "description": "Optional analysis depth: fast, standard, deep, or exhaustive. Defaults to deep for quality.", "default": "deep", "enum": ["fast", "standard", "deep", "exhaustive"]}
+      }
+    }
+  },
+  "external_repo_scan_loop": {
+    "description": "Run a constrained read-only inspiration scan over a public GitHub repository.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["repo_url", "question"],
+      "additionalProperties": false,
+      "properties": {
+        "repo_url": {"type": "string", "description": "Public GitHub repository URL to scan read-only."},
+        "question": {"type": "string", "description": "Pattern or inspiration question for the external repository."},
+        "ref": {"type": "string", "description": "Git ref to scan.", "default": "main"}
+      }
+    }
+  },
+  "coding_task_loop": {
+    "description": "Draft a supervised implementation patch for Codex to inspect, apply, or rewrite.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["task"],
+      "additionalProperties": false,
+      "properties": {
+        "task": {"type": "string", "description": "Specific coding task for a supervised patch-draft proposal."},
+        "context": {"type": "string", "description": "Optional task or repo context.", "default": ""},
+        "file_paths": {"type": "array", "items": {"type": "string"}, "description": "Optional guarded file evidence paths.", "default": []},
+        "file_tree": {"type": "string", "description": "Optional file tree or rg --files output.", "default": ""},
+        "repo_root": {"type": "string", "description": "Optional configured repo_roots name.", "default": ""},
+        "constraints": {"type": "string", "description": "Optional implementation constraints.", "default": ""},
+        "test_command": {"type": "string", "description": "Optional test command Codex should run after review.", "default": ""},
+        "analysis_depth": {"type": "string", "description": "Optional analysis depth: fast, standard, deep, or exhaustive. Defaults to deep for quality.", "default": "deep", "enum": ["fast", "standard", "deep", "exhaustive"]}
+      }
+    }
+  },
+  "usage_report": {
+    "description": "Report local redaction-safe provider call and token usage metadata.",
+    "inputSchema": {
+      "type": "object",
+      "required": [],
+      "additionalProperties": false,
+      "properties": {
+        "days": {"type": "integer", "description": "Number of recent days to include.", "default": 7},
+        "group_by": {"type": "string", "description": "Grouping mode: tool or model.", "default": "tool"}
       }
     }
   }

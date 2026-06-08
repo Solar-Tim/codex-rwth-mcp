@@ -1,8 +1,8 @@
 # Contributing
 
 Contributions are welcome when they keep the project focused: a local MCP
-preprocessing server for Codex that can use RWTH's OpenAI-compatible LLM
-Hosting API.
+deep-loop companion for Codex that can use configured OpenAI-compatible worker
+models.
 
 ## Development Setup
 
@@ -15,7 +15,7 @@ python -m pytest -q
 
 ## Contribution Guidelines
 
-- Keep tool behavior deterministic and testable without live RWTH calls.
+- Keep tool behavior deterministic and testable without live provider calls.
 - Do not commit API keys, screenshots containing secrets, raw logs, or private
   code from third-party projects.
 - Add or update tests for routing, config validation, client payloads, and tool

@@ -38,14 +38,39 @@ tools:
   repo_map_loop:
     routes:
       - model: text
+  deep_repo_review_loop:
+    routes:
+      - model: text
+  deep_test_strategy_loop:
+    routes:
+      - model: text
+  deep_architecture_critic:
+    routes:
+      - model: text
+  external_repo_scan_loop:
+    routes:
+      - model: text
+  coding_task_loop:
+    routes:
+      - model: text
 """,
         encoding="utf-8",
     )
-    monkeypatch.setenv("CODEX_RWTH_MCP_CONFIG", str(config_file))
+    monkeypatch.setenv("CODEX_DEEP_LOOP_MCP_CONFIG", str(config_file))
     monkeypatch.setenv("TEST_KEY", "test-key")
 
     mcp = create_mcp_server()
     tools = await mcp.list_tools()
     names = {tool.name for tool in tools}
 
-    assert {"deep_debug_loop", "deep_diff_review", "repo_map_loop"} <= names
+    assert {
+        "deep_debug_loop",
+        "deep_diff_review",
+        "repo_map_loop",
+        "deep_repo_review_loop",
+        "deep_test_strategy_loop",
+        "deep_architecture_critic",
+        "external_repo_scan_loop",
+        "coding_task_loop",
+        "usage_report",
+    } <= names

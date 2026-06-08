@@ -1,4 +1,4 @@
-"""MCP preprocessing layer for Codex backed by RWTH models."""
+"""MCP deep-loop companion for Codex backed by OpenAI-compatible worker models."""
 
 __all__ = ["__version__"]
 

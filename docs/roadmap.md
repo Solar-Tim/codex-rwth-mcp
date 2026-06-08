@@ -3,7 +3,7 @@
 ## MVP
 
 - Local stdio MCP server for Codex.
-- RWTH OpenAI-compatible chat-completions client.
+- OpenAI-compatible chat-completions client.
 - Config-driven routing by tool, payload size, priority, and model capability.
 - Tools for logs, repository excerpts, screenshots, and diffs.
 - Public documentation, license, security policy, and CI.
@@ -11,7 +11,7 @@
 ## Near-Term
 
 - Token-aware chunking for large logs and diffs.
-- Secret and PII redaction before sending payloads to RWTH.
+- Secret and PII redaction before sending payloads to the configured provider.
 - Better live startup diagnostics for missing API keys and invalid model IDs.
 - Structured JSON summaries with stable fields for Codex handoff.
 - Optional `uvx` and `pipx` install examples after the package layout stabilizes.

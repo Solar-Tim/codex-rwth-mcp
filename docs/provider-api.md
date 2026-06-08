@@ -1,6 +1,8 @@
-# RWTH API Sources
+# Provider API Sources
 
-This project is designed for RWTH's OpenAI-compatible LLM Hosting API.
+This project is designed for OpenAI-compatible chat-completions providers.
+RWTH LLM Hosting and KI:connect.nrw are documented here as example providers
+used for the initial setup.
 
 ## Official Sources
 
@@ -71,5 +73,13 @@ with one returned by `/v1/models`.
 ## Important Boundary
 
 This repository is not affiliated with RWTH Aachen University, RWTH IT Center,
-or WestAI. It is a student-maintained MCP server that can connect to RWTH's
-OpenAI-compatible API when the user already has authorized access.
+WestAI, KI:connect.nrw, or NRW university institutions. It is a
+student-maintained MCP server that can connect to OpenAI-compatible providers
+when the user already has authorized access and a permitted use case.
+
+KI:connect use is governed by the
+[KI:connect terms of use](https://chat.kiconnect.nrw/app/terms-of-use), which
+limit use to university-related purposes such as study, teaching, research,
+qualification procedures, university administration, and tasks for which the
+university is responsible. Configure another compliant provider for private,
+commercial, or otherwise non-covered use cases.

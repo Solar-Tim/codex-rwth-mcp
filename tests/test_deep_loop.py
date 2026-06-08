@@ -109,19 +109,21 @@ async def test_deep_debug_loop_completes_with_bounded_calls_and_cache(tmp_path: 
         context="pytest",
         failing_command="pytest",
         file_paths=[],
+        analysis_depth="fast",
     )
     second = await service.deep_debug_loop(
         logs="ERROR worker failed: missing DATABASE_URL",
         context="pytest",
         failing_command="pytest",
         file_paths=[],
+        analysis_depth="fast",
     )
 
     assert first["status"] == "complete"
     assert first["calls_used"] <= 8
     assert first["model_ids"] == ["rwth-text"]
     assert second["cache_hits"] >= 1
-    assert len(client.text_calls) == 3
+    assert len(client.text_calls) == 2
     assert "ERROR worker failed" not in str(second["cache_hits"])
     assert "DATABASE_URL" not in str(second["cache_hits"])
 
@@ -131,10 +133,8 @@ async def test_deep_debug_loop_cache_misses_when_input_changes(tmp_path: Path):
     client = SequencedRwthClient(
         [
             "map summary: first",
-            "critic: first",
             "status: complete\nsummary: first",
             "map summary: second",
-            "critic: second",
             "status: complete\nsummary: second",
         ]
     )
@@ -145,17 +145,19 @@ async def test_deep_debug_loop_cache_misses_when_input_changes(tmp_path: Path):
         context="pytest",
         failing_command="pytest",
         file_paths=[],
+        analysis_depth="fast",
     )
     second = await service.deep_debug_loop(
         logs="ERROR second failure",
         context="pytest",
         failing_command="pytest",
         file_paths=[],
+        analysis_depth="fast",
     )
 
     assert first["cache_hits"] == 0
     assert second["cache_hits"] == 0
-    assert len(client.text_calls) == 6
+    assert len(client.text_calls) == 4
 
 
 @pytest.mark.asyncio
@@ -163,7 +165,6 @@ async def test_deep_debug_loop_requests_codex_input_when_evidence_is_missing(tmp
     client = SequencedRwthClient(
         [
             "map summary: import error without file context",
-            "critic: need file evidence",
             "status: needs_codex_input\nrequested_evidence: provide src/app.py and full traceback",
         ]
     )
@@ -172,6 +173,7 @@ async def test_deep_debug_loop_requests_codex_input_when_evidence_is_missing(tmp
         context="pytest",
         failing_command="pytest",
         file_paths=[],
+        analysis_depth="fast",
     )
 
     assert result["status"] == "needs_codex_input"
@@ -185,7 +187,6 @@ async def test_deep_diff_review_chunks_and_merges_large_diff(tmp_path: Path):
         [
             "chunk 1 risk: config changed",
             "chunk 2 risk: tests missing",
-            "critic: check migrations",
             "status: complete\nsummary: review complete\nrisk: missing tests",
         ]
     )
@@ -195,11 +196,12 @@ async def test_deep_diff_review_chunks_and_merges_large_diff(tmp_path: Path):
         diff=diff,
         context="PR review",
         file_paths=[],
+        analysis_depth="fast",
     )
 
     assert result["status"] == "complete"
-    assert result["calls_used"] >= 4
-    assert result["calls_used"] <= 8
+    assert result["calls_used"] >= 2
+    assert result["calls_used"] <= 4
     assert result["risks"]
 
 
@@ -220,6 +222,7 @@ async def test_repo_map_loop_reads_allowed_files_and_returns_ranked_findings(tmp
         file_paths=["src/service.py"],
         file_tree="src/service.py",
         context="pytest",
+        analysis_depth="fast",
     )
 
     assert result["status"] == "complete"

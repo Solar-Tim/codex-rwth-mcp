@@ -6,6 +6,7 @@ from .config import AppConfig
 from .prompts import SYSTEM_PROMPT, diff_prompt, logs_prompt, repo_prompt, screenshot_prompt
 from .router import ModelRouter
 from .rwth_client import RwthClient
+from .usage import CompletionResult, CompletionUsage
 
 
 class ToolService:
@@ -79,9 +80,25 @@ class ToolService:
         return _tool_result(tool_name=tool_name, model_id=decision.model.id, summary=summary)
 
 
-def _tool_result(*, tool_name: str, model_id: str, summary: str) -> Dict[str, Any]:
+def _tool_result(*, tool_name: str, model_id: str, summary: Any) -> Dict[str, Any]:
+    completion = _as_completion(summary)
     return {
         "tool": tool_name,
         "model_id": model_id,
-        "summary": summary,
+        "summary": completion.content,
+        **completion.usage.to_dict(),
     }
+
+
+def _as_completion(value: Any) -> CompletionResult:
+    if isinstance(value, CompletionResult):
+        return value
+    text = str(value)
+    return CompletionResult(
+        content=text,
+        usage=CompletionUsage.from_raw(
+            None,
+            estimated_input_chars=0,
+            estimated_output_chars=len(text),
+        ),
+    )

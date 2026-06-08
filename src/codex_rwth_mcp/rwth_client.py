@@ -4,6 +4,7 @@ import os
 from typing import Any, Optional
 
 from .config import ModelConfig, RwthConfig
+from .usage import CompletionResult, CompletionUsage
 
 
 class RwthClient:
@@ -19,7 +20,7 @@ class RwthClient:
         user_prompt: str,
         max_output_tokens: int,
         temperature: float,
-    ) -> str:
+    ) -> CompletionResult:
         response = await self._client.chat.completions.create(
             model=model.id,
             messages=[
@@ -29,7 +30,15 @@ class RwthClient:
             max_tokens=max_output_tokens,
             temperature=temperature,
         )
-        return _extract_message(response)
+        content = _extract_message(response)
+        return CompletionResult(
+            content=content,
+            usage=CompletionUsage.from_raw(
+                getattr(response, "usage", None),
+                estimated_input_chars=len(system_prompt) + len(user_prompt),
+                estimated_output_chars=len(content),
+            ),
+        )
 
     async def complete_vision(
         self,
@@ -41,7 +50,7 @@ class RwthClient:
         mime_type: str,
         max_output_tokens: int,
         temperature: float,
-    ) -> str:
+    ) -> CompletionResult:
         if not model.supports_vision:
             raise ValueError(f"model {model.id!r} does not support vision")
         response = await self._client.chat.completions.create(
@@ -64,7 +73,15 @@ class RwthClient:
             max_tokens=max_output_tokens,
             temperature=temperature,
         )
-        return _extract_message(response)
+        content = _extract_message(response)
+        return CompletionResult(
+            content=content,
+            usage=CompletionUsage.from_raw(
+                getattr(response, "usage", None),
+                estimated_input_chars=len(system_prompt) + len(user_prompt),
+                estimated_output_chars=len(content),
+            ),
+        )
 
     @staticmethod
     def _create_openai_client(config: RwthConfig) -> Any:
@@ -76,7 +93,7 @@ class RwthClient:
             from openai import AsyncOpenAI
         except ImportError as exc:
             raise RuntimeError(
-                "openai package is required for live RWTH API calls"
+                "openai package is required for live provider API calls"
             ) from exc
 
         kwargs = {
@@ -93,7 +110,7 @@ def _extract_message(response: Any) -> str:
     try:
         content = response.choices[0].message.content
     except (AttributeError, IndexError) as exc:
-        raise RuntimeError("RWTH response did not include chat message content") from exc
+        raise RuntimeError("provider response did not include chat message content") from exc
     if not content:
-        raise RuntimeError("RWTH response content was empty")
+        raise RuntimeError("provider response content was empty")
     return str(content)

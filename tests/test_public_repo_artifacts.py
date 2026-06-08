@@ -7,6 +7,7 @@ from codex_rwth_mcp.config import load_config
 
 ROOT = Path(__file__).resolve().parents[1]
 KICONNECT_MODELS_DOC_URL = "https://chat.kiconnect.nrw/app/api-docs/#tag/models/get/v1models"
+KICONNECT_TERMS_URL = "https://chat.kiconnect.nrw/app/terms-of-use"
 RWTH_STUDENT_API_ACCESS_URL = "https://www.itc.rwth-aachen.de/go/id/bndrow?lidx=1#aaaaaaaaabndrpc"
 
 
@@ -19,7 +20,7 @@ def test_public_repository_hygiene_files_exist():
         ".gitignore",
         ".env.example",
         ".github/workflows/ci.yml",
-        "docs/rwth-api.md",
+        "docs/provider-api.md",
         "docs/roadmap.md",
     ]
 
@@ -48,15 +49,23 @@ def test_kiconnect_config_uses_documented_api_endpoint_and_live_model_ids():
 
 def test_kiconnect_models_reference_is_linked_from_public_docs():
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    api_notes = (ROOT / "docs/rwth-api.md").read_text(encoding="utf-8")
+    api_notes = (ROOT / "docs/provider-api.md").read_text(encoding="utf-8")
 
     assert KICONNECT_MODELS_DOC_URL in readme
     assert KICONNECT_MODELS_DOC_URL in api_notes
 
 
+def test_kiconnect_terms_are_linked_from_public_docs():
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    api_notes = (ROOT / "docs/provider-api.md").read_text(encoding="utf-8")
+
+    assert KICONNECT_TERMS_URL in readme
+    assert KICONNECT_TERMS_URL in api_notes
+
+
 def test_rwth_student_api_access_announcement_is_linked_from_public_docs():
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    api_notes = (ROOT / "docs/rwth-api.md").read_text(encoding="utf-8")
+    api_notes = (ROOT / "docs/provider-api.md").read_text(encoding="utf-8")
 
     assert RWTH_STUDENT_API_ACCESS_URL in readme
     assert RWTH_STUDENT_API_ACCESS_URL in api_notes

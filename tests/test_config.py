@@ -63,3 +63,66 @@ tools:
         assert "unknown model" in str(exc)
     else:
         raise AssertionError("expected config validation to fail")
+
+
+def test_load_config_prefers_new_config_env_var(monkeypatch, tmp_path: Path):
+    old_config = tmp_path / "old.yaml"
+    old_config.write_text(
+        """
+rwth:
+  base_url: https://old.example/v1
+models:
+  small:
+    id: old-small
+tools:
+  summarize_logs:
+    routes:
+      - model: small
+""",
+        encoding="utf-8",
+    )
+    new_config = tmp_path / "new.yaml"
+    new_config.write_text(
+        """
+rwth:
+  base_url: https://new.example/v1
+models:
+  small:
+    id: new-small
+tools:
+  summarize_logs:
+    routes:
+      - model: small
+""",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("CODEX_RWTH_MCP_CONFIG", str(old_config))
+    monkeypatch.setenv("CODEX_DEEP_LOOP_MCP_CONFIG", str(new_config))
+
+    config = load_config()
+
+    assert config.rwth.base_url == "https://new.example/v1"
+
+
+def test_load_config_keeps_old_config_env_var_fallback(monkeypatch, tmp_path: Path):
+    config_file = tmp_path / "routing.yaml"
+    config_file.write_text(
+        """
+rwth:
+  base_url: https://fallback.example/v1
+models:
+  small:
+    id: fallback-small
+tools:
+  summarize_logs:
+    routes:
+      - model: small
+""",
+        encoding="utf-8",
+    )
+    monkeypatch.delenv("CODEX_DEEP_LOOP_MCP_CONFIG", raising=False)
+    monkeypatch.setenv("CODEX_RWTH_MCP_CONFIG", str(config_file))
+
+    config = load_config()
+
+    assert config.rwth.base_url == "https://fallback.example/v1"
