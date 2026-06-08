@@ -41,9 +41,6 @@ not store prompts, API keys, or raw evidence.
 Before using this with real projects:
 
 - Confirm you are allowed to send the data to the configured provider service.
-- If you use KI:connect, confirm your use is covered by its terms and your
-  institutional authorization. Configure another compliant provider for private,
-  commercial, or otherwise non-covered use cases.
 - Avoid sending secrets, tokens, private keys, credentials, or personal data.
 - Review `file_paths` before passing them to deep-loop tools.
 - Review configured `repo_roots` before using multi-repo evidence.

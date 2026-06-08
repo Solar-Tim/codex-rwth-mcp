@@ -68,7 +68,7 @@ Responsibilities:
 - `server.py`: MCP transport and tool registration.
 - `tools.py`: tool service API and result shape.
 - `router.py`: deterministic model routing.
-- `rwth_client.py`: OpenAI-compatible chat-completions wrapper. The filename is retained for compatibility with the initial RWTH/KI:connect implementation.
+- `rwth_client.py`: OpenAI-compatible chat-completions wrapper. The filename is retained for compatibility with the initial provider-specific implementation.
 - `prompts.py`: prompt templates.
 - `config.py`: YAML parsing and validation.
 - `deep_loop.py`: stable deep-loop service facade, guarded file evidence loading, response caching, usage accounting, and result parsing.
@@ -177,9 +177,8 @@ local deployment surface for Codex.
 - Pin dependencies in production and run the server in a dedicated virtualenv.
 - Prefer user-level Codex MCP config for secrets; project config is fine for
   non-secret paths in trusted repos.
-- KI:connect usage is governed by the KI:connect terms of use and institutional
-  authorization. Configure another compliant OpenAI-compatible provider for
-  private, commercial, or otherwise non-covered use cases.
+- Configure an OpenAI-compatible provider whose terms allow your intended use
+  case.
 
 ## Step-by-Step Build Order
 

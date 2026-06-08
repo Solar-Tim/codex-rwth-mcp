@@ -23,8 +23,8 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--config",
-        default="config/routing.kiconnect.yaml",
-        help="Routing config to use. Defaults to config/routing.kiconnect.yaml.",
+        default="config/routing.yaml",
+        help="Routing config to use. Defaults to config/routing.yaml.",
     )
     parser.add_argument("--logs", default=DEFAULT_LOGS)
     parser.add_argument("--context", default=DEFAULT_CONTEXT)

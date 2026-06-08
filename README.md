@@ -4,13 +4,12 @@ Local Python MCP server that lets Codex offload high-volume deep-loop analysis
 to configured OpenAI-compatible worker models while keeping code edits,
 architectural decisions, shell commands, and final reasoning in Codex.
 
-The project is provider-configurable. RWTH LLM Hosting and KI:connect.nrw are
-documented example providers because they were used for the initial setup, but
-the code is not RWTH-specific.
+The project is provider-configurable. RWTH LLM Hosting is documented as one
+OpenAI-compatible example provider because it was used for the initial setup,
+but the code is not RWTH-specific.
 
 This project is student-maintained and independent. It is not an official RWTH
-Aachen University, RWTH IT Center, WestAI, KI:connect.nrw, or NRW university
-service.
+Aachen University, RWTH IT Center, WestAI, or university service.
 
 ## Repository Identity
 
@@ -27,33 +26,20 @@ work, but new setups should prefer `codex-deep-loop-mcp`,
 
 You are responsible for using a provider, endpoint, API key, and submitted data
 under terms that permit your use case. Switching API keys does not change the
-terms for a provider. For private, commercial, or non-university use, configure
-an OpenAI-compatible provider whose terms allow that use.
-
-KI:connect.nrw use is limited by its own terms and institutional eligibility.
-The KI:connect terms state that the service may only be used for study,
-teaching, research, qualification procedures, university administration, and
-tasks for which the university is responsible, and not for private purposes.
-See the [KI:connect terms of use](https://chat.kiconnect.nrw/app/terms-of-use).
+terms for a provider. Configure an OpenAI-compatible provider whose terms allow
+your intended use.
 
 ## Provider API Sources
 
 Read the relevant provider docs before using the server:
 
 - RWTH IT Center: [Using Large Language Models](https://help.itc.rwth-aachen.de/en/service/5a9d03f1675f4f85ac9b3fd7bb853d44/article/80525f9e55c443af86d2698d0cbed743/)
-- RWTH IT Center: [RWTHgpt API access announcement](https://www.itc.rwth-aachen.de/go/id/bndrow?lidx=1#aaaaaaaaabndrpc)
 - WestAI: [Large Language Models](https://www.westai.de/services/large-language-models/)
-- KiConnect: [Models API reference](https://chat.kiconnect.nrw/app/api-docs/#tag/models/get/v1models)
-- KiConnect: [Terms of use](https://chat.kiconnect.nrw/app/terms-of-use)
 
 The RWTH IT Center docs describe an OpenAI-compatible endpoint at
 `https://llm.hpc.itc.rwth-aachen.de/`, access tokens from the LLM project page,
 model discovery through `/v1/models`, and chat calls through
-`/v1/chat/completions`. The KiConnect API reference documents the same
-OpenAI-style model discovery shape under
-`https://chat.kiconnect.nrw/api/v1/models`.
-The RWTHgpt API access announcement lists the student-accessible models used
-by `config/routing.kiconnect.yaml`.
+`/v1/chat/completions`.
 
 ## What It Does
 
@@ -110,20 +96,6 @@ curl -H "Authorization: Bearer $RWTH_OPENAI_API_KEY" \
 If your available model IDs differ from the examples, copy
 `config/routing.example.yaml` to `config/routing.local.yaml`, edit the model
 IDs, and set `CODEX_DEEP_LOOP_MCP_CONFIG` to that local file.
-
-### KiConnect Access
-
-For KiConnect API keys, use the KiConnect routing file:
-
-```bash
-export KICONNECT_API_KEY="paste-your-token"
-export CODEX_DEEP_LOOP_MCP_CONFIG="$PWD/config/routing.kiconnect.yaml"
-```
-
-The KiConnect API reference documents Bearer authentication and OpenAI-style
-endpoints under `https://chat.kiconnect.nrw/api/v1`. Use the
-[Models API reference](https://chat.kiconnect.nrw/app/api-docs/#tag/models/get/v1models)
-as the source of truth for checking model discovery.
 
 Run a live smoke test:
 
@@ -204,14 +176,6 @@ CODEX_DEEP_LOOP_MCP_CONFIG="$PWD/config/routing.yaml" \
 .venv/bin/python -m codex_rwth_mcp
 ```
 
-For KiConnect:
-
-```bash
-KICONNECT_API_KEY="$KICONNECT_API_KEY" \
-CODEX_DEEP_LOOP_MCP_CONFIG="$PWD/config/routing.kiconnect.yaml" \
-.venv/bin/python -m codex_rwth_mcp
-```
-
 ## Development
 
 ```bash
@@ -230,7 +194,7 @@ See `SECURITY.md` for reporting and data-handling expectations.
 
 ## Documentation
 
-- `docs/provider-api.md`: provider API source notes, KiConnect terms boundary, and endpoint details.
+- `docs/provider-api.md`: provider API source notes and endpoint details.
 - `docs/architecture.md`: architecture diagram, project structure, build plan, security notes, and future work.
 - `docs/tool-schemas.json`: MCP-facing tool schemas.
 - `docs/roadmap.md`: MVP, near-term, and multi-model roadmap.

@@ -6,9 +6,6 @@ from codex_rwth_mcp.config import load_config
 
 
 ROOT = Path(__file__).resolve().parents[1]
-KICONNECT_MODELS_DOC_URL = "https://chat.kiconnect.nrw/app/api-docs/#tag/models/get/v1models"
-KICONNECT_TERMS_URL = "https://chat.kiconnect.nrw/app/terms-of-use"
-RWTH_STUDENT_API_ACCESS_URL = "https://www.itc.rwth-aachen.de/go/id/bndrow?lidx=1#aaaaaaaaabndrpc"
 
 
 def test_public_repository_hygiene_files_exist():
@@ -35,51 +32,16 @@ def test_default_config_uses_documented_rwth_endpoint():
     assert config.rwth.base_url == "https://llm.hpc.itc.rwth-aachen.de"
 
 
-def test_kiconnect_config_uses_documented_api_endpoint_and_live_model_ids():
-    config = load_config(ROOT / "config/routing.kiconnect.yaml")
-
-    assert config.rwth.base_url == "https://chat.kiconnect.nrw/api/v1"
-    assert config.rwth.api_key_env == "KICONNECT_API_KEY"
-    assert {model.id for model in config.models.values()} == {
-        "gpt-oss-120b",
-        "mistralai-mistral-small-4-119b",
-    }
-    assert config.tools["summarize_logs"].routes[0].model == "cheap_text"
-
-
-def test_kiconnect_models_reference_is_linked_from_public_docs():
-    readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    api_notes = (ROOT / "docs/provider-api.md").read_text(encoding="utf-8")
-
-    assert KICONNECT_MODELS_DOC_URL in readme
-    assert KICONNECT_MODELS_DOC_URL in api_notes
-
-
-def test_kiconnect_terms_are_linked_from_public_docs():
-    readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    api_notes = (ROOT / "docs/provider-api.md").read_text(encoding="utf-8")
-
-    assert KICONNECT_TERMS_URL in readme
-    assert KICONNECT_TERMS_URL in api_notes
-
-
-def test_rwth_student_api_access_announcement_is_linked_from_public_docs():
-    readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    api_notes = (ROOT / "docs/provider-api.md").read_text(encoding="utf-8")
-
-    assert RWTH_STUDENT_API_ACCESS_URL in readme
-    assert RWTH_STUDENT_API_ACCESS_URL in api_notes
-
-
 def test_live_smoke_script_refuses_to_run_without_api_key(monkeypatch):
-    monkeypatch.delenv("KICONNECT_API_KEY", raising=False)
+    config = load_config(ROOT / "config/routing.yaml")
+    monkeypatch.delenv(config.rwth.api_key_env, raising=False)
 
     result = subprocess.run(
         [
             sys.executable,
             str(ROOT / "scripts/live_smoke.py"),
             "--config",
-            str(ROOT / "config/routing.kiconnect.yaml"),
+            str(ROOT / "config/routing.yaml"),
         ],
         cwd=ROOT,
         text=True,
@@ -88,15 +50,45 @@ def test_live_smoke_script_refuses_to_run_without_api_key(monkeypatch):
     )
 
     assert result.returncode == 2
-    assert "KICONNECT_API_KEY is required" in result.stderr
+    assert f"{config.rwth.api_key_env} is required" in result.stderr
     assert "Bearer" not in result.stderr
+
+
+def test_public_files_do_not_reference_removed_provider():
+    public_files = [
+        *ROOT.glob("*.md"),
+        *ROOT.glob("docs/*.md"),
+        *(
+            path
+            for path in ROOT.glob("config/*.yaml")
+            if path.name != "routing.local.yaml"
+        ),
+        *ROOT.glob("examples/*.toml"),
+        ROOT / "scripts/live_smoke.py",
+    ]
+    provider = "ki" + "connect"
+    forbidden = [provider, "ki" + ":connect", "chat." + provider, provider.upper()]
+
+    offenders = []
+    for path in public_files:
+        text = path.read_text(encoding="utf-8")
+        lowered = text.lower()
+        for marker in forbidden:
+            if marker.lower() in lowered:
+                offenders.append(f"{path.relative_to(ROOT)} contains {marker}")
+
+    assert offenders == []
 
 
 def test_public_files_do_not_contain_obvious_secret_placeholders():
     public_files = [
         *ROOT.glob("*.md"),
         *ROOT.glob("docs/*.md"),
-        *ROOT.glob("config/*.yaml"),
+        *(
+            path
+            for path in ROOT.glob("config/*.yaml")
+            if path.name != "routing.local.yaml"
+        ),
         *ROOT.glob("examples/*.toml"),
     ]
     forbidden = ["sk-", "YOUR-API-KEY", "your-openai-key"]
