@@ -11,6 +11,9 @@ enabled_tools = [
   "summarize_repo",
   "analyze_screenshot",
   "summarize_diff",
+  "deep_debug_loop",
+  "deep_diff_review",
+  "repo_map_loop",
 ]
 env_vars = ["RWTH_OPENAI_API_KEY"]
 

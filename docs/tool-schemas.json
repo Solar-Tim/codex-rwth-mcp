@@ -79,5 +79,91 @@
         }
       }
     }
+  },
+  "deep_debug_loop": {
+    "description": "Run a bounded KiConnect debugging loop and return a Codex handoff or evidence requests.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["logs"],
+      "additionalProperties": false,
+      "properties": {
+        "logs": {
+          "type": "string",
+          "description": "Logs, traces, terminal output, or CI output to debug."
+        },
+        "context": {
+          "type": "string",
+          "description": "Optional service, repo, recent change, or failure context.",
+          "default": ""
+        },
+        "failing_command": {
+          "type": "string",
+          "description": "Optional command that failed, if known.",
+          "default": ""
+        },
+        "file_paths": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Optional repo-relative file paths for guarded MCP-side evidence loading.",
+          "default": []
+        }
+      }
+    }
+  },
+  "deep_diff_review": {
+    "description": "Run a bounded KiConnect diff-review loop with chunking, merge, and critic phases.",
+    "inputSchema": {
+      "type": "object",
+      "required": [],
+      "additionalProperties": false,
+      "properties": {
+        "diff": {
+          "type": "string",
+          "description": "Unified diff, PR patch, or copied change set.",
+          "default": ""
+        },
+        "context": {
+          "type": "string",
+          "description": "Optional PR title, issue link, release risk, or review focus.",
+          "default": ""
+        },
+        "file_paths": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Optional repo-relative file paths for guarded MCP-side evidence loading.",
+          "default": []
+        }
+      }
+    }
+  },
+  "repo_map_loop": {
+    "description": "Run a bounded KiConnect repository-mapping loop over provided tree and guarded file evidence.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["question"],
+      "additionalProperties": false,
+      "properties": {
+        "question": {
+          "type": "string",
+          "description": "Architecture, ownership, flow, or relevant-file question."
+        },
+        "file_paths": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Optional repo-relative file paths for guarded MCP-side evidence loading.",
+          "default": []
+        },
+        "file_tree": {
+          "type": "string",
+          "description": "Optional file tree or rg --files output.",
+          "default": ""
+        },
+        "context": {
+          "type": "string",
+          "description": "Optional repo or task context.",
+          "default": ""
+        }
+      }
+    }
   }
 }

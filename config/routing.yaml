@@ -61,3 +61,33 @@ tools:
       - model: long_text
         max_input_chars: 100000
         priority: 20
+  deep_debug_loop:
+    max_output_tokens: 1200
+    temperature: 0.1
+    routes:
+      - model: cheap_text
+        max_input_chars: 64000
+        priority: 10
+      - model: long_text
+        max_input_chars: 100000
+        priority: 20
+  deep_diff_review:
+    max_output_tokens: 1200
+    temperature: 0.1
+    routes:
+      - model: cheap_text
+        max_input_chars: 64000
+        priority: 10
+      - model: long_text
+        max_input_chars: 100000
+        priority: 20
+  repo_map_loop:
+    max_output_tokens: 1200
+    temperature: 0.1
+    routes:
+      - model: cheap_text
+        max_input_chars: 64000
+        priority: 10
+      - model: long_text
+        max_input_chars: 100000
+        priority: 20

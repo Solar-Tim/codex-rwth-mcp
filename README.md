@@ -27,12 +27,15 @@ by `config/routing.kiconnect.yaml`.
 
 ## What It Does
 
-The server exposes four MCP tools to Codex:
+The server exposes seven MCP tools to Codex:
 
 - `summarize_logs`: cluster logs, identify likely root causes, and produce a compact debugging summary.
 - `summarize_repo`: summarize repository excerpts, architecture, flow, and relevant files.
 - `analyze_screenshot`: inspect UI, terminal, browser, dashboard, or devtools screenshots.
 - `summarize_diff`: summarize large diffs or PR patches, risks, and affected areas.
+- `deep_debug_loop`: run bounded KiConnect map/critic/final debugging passes over logs and selected repo files.
+- `deep_diff_review`: chunk and review large diffs with merge and critic passes.
+- `repo_map_loop`: map relevant files/components from a question, file tree, and guarded repo file reads.
 
 Codex only sees these tool interfaces. RWTH model selection stays hidden behind
 `config/routing.yaml`.
@@ -90,6 +93,20 @@ Run a live smoke test:
 The smoke test checks `/models`, verifies the configured model IDs are
 available, constructs the MCP server, and calls `summarize_logs` with a small
 synthetic log snippet.
+
+## Deep-Loop Tools
+
+The deep-loop tools reduce Codex context usage by letting KiConnect perform
+bounded LangGraph-orchestrated analysis before returning a compact handoff.
+Each invocation is capped at eight KiConnect calls and may return
+`status: "needs_codex_input"` with concrete evidence requests for Codex to
+gather before calling again.
+
+Deep-loop tools can read repo-relative `file_paths`, but only under the current
+repo root. They block `.git`, virtual environments, `.env*`, key material,
+`config/routing.local.yaml`, binary files, oversized files, and path traversal.
+LangGraph coordinates only analysis phases; Codex remains responsible for file
+edits, shell commands, test execution, and final decisions.
 
 ## Add To Codex
 

@@ -9,6 +9,7 @@ description = "Codex MCP preprocessing layer backed by RWTH OpenAI-compatible mo
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+  "langgraph>=1.0,<2",
   "mcp>=1.16.0",
   "openai>=1.99.0",
   "pydantic>=2.8.0",

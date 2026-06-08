@@ -11,10 +11,14 @@ final reasoning in Codex.
 ```mermaid
 flowchart LR
     Codex["GPT-5 Codex"] -->|"MCP tool call"| MCP["MCP Transport\nFastMCP stdio"]
-    MCP --> Tools["Tool Definitions\nsummarize_logs\nsummarize_repo\nanalyze_screenshot\nsummarize_diff"]
-    Tools --> Service["Tool Service\nvalidation + prompt assembly"]
+    MCP --> Tools["Tool Definitions\nsummarize_*\nanalyze_screenshot\ndeep_*_loop"]
+    Tools --> Service["Tool Service\nstable MCP facade"]
+    Service --> Graph["LangGraph Runner\nbounded map/critic/final phases"]
+    Graph --> Evidence["File Evidence Loader\nrepo-root guarded reads"]
+    Graph --> Cache["Response Cache\ncontent-hash metadata"]
     Service --> Router["Model Router\nconfig-driven route choice"]
     Router --> Config["routing.yaml\nmodels + tool routes"]
+    Graph --> Service
     Service --> Client["RWTH Client\nOpenAI-compatible chat completions"]
     Client --> RWTH["RWTH API\ntext + vision models"]
     RWTH --> Client --> Service --> MCP --> Codex
@@ -48,6 +52,8 @@ codex-rwth-mcp/
     rwth_client.py
     server.py
     tools.py
+    deep_loop.py
+    deep_loop_graph.py
   tests/
     test_config.py
     test_router.py
@@ -63,6 +69,8 @@ Responsibilities:
 - `rwth_client.py`: OpenAI-compatible RWTH chat-completions wrapper.
 - `prompts.py`: prompt templates.
 - `config.py`: YAML parsing and validation.
+- `deep_loop.py`: stable deep-loop service facade, guarded file evidence loading, response caching, and result parsing.
+- `deep_loop_graph.py`: LangGraph orchestration for bounded map/critic/final deep-loop phases.
 
 ## Detailed Implementation Plan
 
@@ -147,7 +155,10 @@ local deployment surface for Codex.
 - Add a redaction middleware before production use for secrets, tokens, emails,
   private URLs, student IDs, and customer data.
 - Keep Codex as the only layer that edits files or makes final decisions.
-- Do not expose arbitrary file reads through the MCP server.
+- Deep-loop file reads are constrained to explicitly supplied repo-relative paths,
+  repo-root confinement, secret/binary exclusions, and per-file size caps.
+- LangGraph nodes coordinate only analysis phases and do not edit files, run shell
+  commands, or interrupt Codex mid-call.
 - Set conservative `tool_timeout_sec` values in Codex config.
 - Log metadata, route names, and durations, but avoid logging raw prompts by default.
 - Pin dependencies in production and run the server in a dedicated virtualenv.
@@ -196,7 +207,8 @@ Not included in MVP:
 ## Future Enhancements
 
 - Tokenizer-based payload sizing per RWTH model.
-- Chunk-map-reduce summarization for very large logs and repositories.
+- Additional specialized LangGraph nodes for repo maps, debugging, and diff review.
+- Tokenizer-based chunking for very large logs and repositories.
 - Secret/PII redaction pipeline with allow-list overrides.
 - Retry, timeout, and fallback policy per model route.
 - Structured JSON result schemas per tool.
@@ -204,6 +216,8 @@ Not included in MVP:
 - Streamable HTTP transport for shared team deployment.
 - Per-repo routing overrides and policy profiles.
 - Optional local caching keyed by content hash.
+- LangGraph checkpointing or resumable workflows if Codex gains a reliable
+  interrupt/resume integration contract.
 - Evaluation fixtures for summarization quality and regression testing.
 
 ## Source Notes
