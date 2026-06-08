@@ -1,0 +1,83 @@
+{
+  "summarize_logs": {
+    "description": "Cluster errors, identify likely root causes, and return a compact debugging summary.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["logs"],
+      "additionalProperties": false,
+      "properties": {
+        "logs": {
+          "type": "string",
+          "description": "Raw logs, traces, terminal output, or CI output to analyze."
+        },
+        "context": {
+          "type": "string",
+          "description": "Optional context such as service name, time window, recent change, or failing command.",
+          "default": ""
+        }
+      }
+    }
+  },
+  "summarize_repo": {
+    "description": "Summarize repository architecture, code flow, and relevant files/components.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["files"],
+      "additionalProperties": false,
+      "properties": {
+        "files": {
+          "type": "string",
+          "description": "Concatenated file excerpts with paths. Include only relevant source, config, and docs."
+        },
+        "question": {
+          "type": "string",
+          "description": "Optional focus question for architecture, flow, ownership, or relevant components.",
+          "default": ""
+        }
+      }
+    }
+  },
+  "analyze_screenshot": {
+    "description": "Extract actionable debugging insights from UI, error, terminal, dashboard, or devtools screenshots.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["image_base64"],
+      "additionalProperties": false,
+      "properties": {
+        "image_base64": {
+          "type": "string",
+          "description": "Base64-encoded screenshot. PNG is preferred for UI, terminal, and browser screenshots."
+        },
+        "mime_type": {
+          "type": "string",
+          "description": "Image MIME type such as image/png or image/jpeg.",
+          "default": "image/png"
+        },
+        "question": {
+          "type": "string",
+          "description": "Optional diagnostic focus, for example visible error, layout issue, or dashboard anomaly.",
+          "default": ""
+        }
+      }
+    }
+  },
+  "summarize_diff": {
+    "description": "Summarize changes, risks, affected areas, and review focus from a large diff.",
+    "inputSchema": {
+      "type": "object",
+      "required": ["diff"],
+      "additionalProperties": false,
+      "properties": {
+        "diff": {
+          "type": "string",
+          "description": "Unified git diff, PR patch, or copied change set."
+        },
+        "context": {
+          "type": "string",
+          "description": "Optional context such as PR title, issue link, release risk, or review focus.",
+          "default": ""
+        }
+      }
+    }
+  }
+}

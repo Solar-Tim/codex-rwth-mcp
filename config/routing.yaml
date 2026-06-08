@@ -1,0 +1,63 @@
+server_name: codex-rwth-mcp
+
+rwth:
+  base_url: https://llm.hpc.itc.rwth-aachen.de
+  api_key_env: RWTH_OPENAI_API_KEY
+  request_timeout_sec: 60
+
+models:
+  cheap_text:
+    id: mistralai/Mixtral-8x22B-Instruct-v0.1
+    supports_vision: false
+    max_input_chars: 64000
+    cost_weight: 1.0
+  long_text:
+    id: mistralai/Mistral-Small-3.2-24B-Instruct-2506
+    supports_vision: true
+    max_input_chars: 100000
+    cost_weight: 2.0
+  vision:
+    id: mistralai/Mistral-Small-3.2-24B-Instruct-2506
+    supports_vision: true
+    max_input_chars: 20000
+    cost_weight: 1.5
+
+tools:
+  summarize_logs:
+    max_output_tokens: 900
+    temperature: 0.1
+    routes:
+      - model: cheap_text
+        max_input_chars: 64000
+        priority: 10
+      - model: long_text
+        max_input_chars: 100000
+        priority: 20
+  summarize_repo:
+    max_output_tokens: 1200
+    temperature: 0.1
+    routes:
+      - model: cheap_text
+        max_input_chars: 64000
+        priority: 10
+      - model: long_text
+        max_input_chars: 100000
+        priority: 20
+  analyze_screenshot:
+    max_output_tokens: 800
+    temperature: 0.0
+    routes:
+      - model: vision
+        requires_vision: true
+        max_input_chars: 20000
+        priority: 10
+  summarize_diff:
+    max_output_tokens: 1200
+    temperature: 0.1
+    routes:
+      - model: cheap_text
+        max_input_chars: 64000
+        priority: 10
+      - model: long_text
+        max_input_chars: 100000
+        priority: 20

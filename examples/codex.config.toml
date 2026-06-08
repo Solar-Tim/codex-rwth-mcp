@@ -1,0 +1,27 @@
+# User-level example: ~/.codex/config.toml
+[mcp_servers.codex_rwth]
+command = "/absolute/path/to/codex-rwth-mcp/.venv/bin/python"
+args = ["-m", "codex_rwth_mcp"]
+cwd = "/absolute/path/to/codex-rwth-mcp"
+startup_timeout_sec = 10
+tool_timeout_sec = 120
+enabled = true
+enabled_tools = [
+  "summarize_logs",
+  "summarize_repo",
+  "analyze_screenshot",
+  "summarize_diff",
+]
+env_vars = ["RWTH_OPENAI_API_KEY"]
+
+[mcp_servers.codex_rwth.env]
+CODEX_RWTH_MCP_CONFIG = "/absolute/path/to/codex-rwth-mcp/config/routing.yaml"
+
+# Prefer forwarding the secret from the local environment instead of storing it
+# in config.toml.
+
+# Alternative CLI setup:
+# codex mcp add codex_rwth \
+#   --env CODEX_RWTH_MCP_CONFIG=/absolute/path/to/codex-rwth-mcp/config/routing.yaml \
+#   --env RWTH_OPENAI_API_KEY="$RWTH_OPENAI_API_KEY" \
+#   -- /absolute/path/to/codex-rwth-mcp/.venv/bin/python -m codex_rwth_mcp

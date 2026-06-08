@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "codex-rwth-mcp"
+version = "0.1.0"
+description = "Codex MCP preprocessing layer backed by RWTH OpenAI-compatible models"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "mcp>=1.16.0",
+  "openai>=1.99.0",
+  "pydantic>=2.8.0",
+  "PyYAML>=6.0.2",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3.0",
+  "pytest-asyncio>=0.24.0",
+]
+
+[project.scripts]
+codex-rwth-mcp = "codex_rwth_mcp.__main__:main"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/codex_rwth_mcp"]
