@@ -27,7 +27,7 @@ by `config/routing.kiconnect.yaml`.
 
 ## What It Does
 
-The server exposes seven MCP tools to Codex:
+The server exposes thirteen MCP tools to Codex:
 
 - `summarize_logs`: cluster logs, identify likely root causes, and produce a compact debugging summary.
 - `summarize_repo`: summarize repository excerpts, architecture, flow, and relevant files.
@@ -36,6 +36,12 @@ The server exposes seven MCP tools to Codex:
 - `deep_debug_loop`: run bounded KiConnect map/critic/final debugging passes over logs and selected repo files.
 - `deep_diff_review`: chunk and review large diffs with merge and critic passes.
 - `repo_map_loop`: map relevant files/components from a question, file tree, and guarded repo file reads.
+- `deep_repo_review_loop`: perform broad repo review and risk mapping over guarded evidence.
+- `deep_test_strategy_loop`: propose focused test strategy from diffs, failures, and selected files.
+- `deep_architecture_critic`: critique architecture decisions, coupling risks, and tradeoffs.
+- `external_repo_scan_loop`: scan a public GitHub repo read-only for implementation inspiration.
+- `coding_task_loop`: return a supervised implementation plan and unified diff patch draft for Codex to inspect.
+- `usage_report`: aggregate local redaction-safe KiConnect call, cache, token, and character metadata.
 
 Codex only sees these tool interfaces. RWTH model selection stays hidden behind
 `config/routing.yaml`.
@@ -98,15 +104,44 @@ synthetic log snippet.
 
 The deep-loop tools reduce Codex context usage by letting KiConnect perform
 bounded LangGraph-orchestrated analysis before returning a compact handoff.
-Each invocation is capped at eight KiConnect calls and may return
-`status: "needs_codex_input"` with concrete evidence requests for Codex to
-gather before calling again.
+They support `analysis_depth` values of `fast`, `standard`, `deep`, and
+`exhaustive`. The default is `deep`, which spends more KiConnect calls for
+better evidence mining, role fanout, synthesis, and critique. Use `fast` or
+`standard` when latency matters more than coverage.
 
-Deep-loop tools can read repo-relative `file_paths`, but only under the current
-repo root. They block `.git`, virtual environments, `.env*`, key material,
-`config/routing.local.yaml`, binary files, oversized files, and path traversal.
-LangGraph coordinates only analysis phases; Codex remains responsible for file
-edits, shell commands, test execution, and final decisions.
+Depth budgets are bounded per invocation: `fast` uses up to 4 live calls,
+`standard` up to 8, `deep` up to 16, and `exhaustive` up to 32. Deep-loop tools
+may return `status: "needs_codex_input"` with concrete evidence requests for
+Codex to gather before calling again.
+
+Deep-loop tools can read repo-relative `file_paths` under the current repo root
+or under a named `repo_roots` allowlist entry from the routing config. Tool
+inputs may select a configured root by name with `repo_root`; arbitrary absolute
+paths are rejected. File reads block `.git`, virtual environments, `.env*`, key
+material, `config/routing.local.yaml`, binary files, oversized files, and path
+traversal.
+
+The specialist tools build on the same bounded LangGraph/KiConnect loop:
+`deep_repo_review_loop`, `deep_test_strategy_loop`, and
+`deep_architecture_critic` are for larger review and design work. In `deep` and
+`exhaustive` modes, the internal graph fans out to mapper, risk finder,
+test-strategist, and architecture-critic roles, then runs RWTH synthesizer and
+critic passes. `coding_task_loop` is the only tool that also enables a
+patch-drafter role.
+`external_repo_scan_loop` clones or fetches public GitHub repositories only into
+cache storage and reads safe text files; it never executes external code.
+`coding_task_loop` may draft a unified diff, but it does not edit the active
+checkout. Codex must inspect, apply or rewrite the patch, run tests, and make
+the final decision.
+
+Usage metadata is recorded locally in
+`~/.cache/codex-rwth-mcp/usage.jsonl` by default. Results expose aggregate
+token counts when the API provides them, character estimates otherwise, and
+phase/role-level usage metadata without raw prompts or API keys. Deep-loop
+results also include additive judged metadata such as `ranked_findings`,
+`evidence_references`, `disagreements`, `confidence`, `verification_hints`,
+`analysis_depth`, and `roles_used`. Use `usage_report` to inspect recent usage
+by tool or model.
 
 ## Add To Codex
 

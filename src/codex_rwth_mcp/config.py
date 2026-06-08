@@ -47,6 +47,7 @@ class AppConfig:
     models: Dict[str, ModelConfig]
     tools: Dict[str, ToolConfig]
     server_name: str = "codex-rwth-mcp"
+    repo_roots: Dict[str, Path] = field(default_factory=dict)
 
 
 def default_config_path() -> Path:
@@ -116,6 +117,10 @@ def _parse_config(raw: Dict[str, Any]) -> AppConfig:
         models=models,
         tools=tools,
         server_name=str(raw.get("server_name", "codex-rwth-mcp")),
+        repo_roots={
+            str(name): Path(str(path)).expanduser()
+            for name, path in (raw.get("repo_roots", {}) or {}).items()
+        },
     )
 
 

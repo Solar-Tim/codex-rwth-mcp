@@ -16,9 +16,26 @@ EXPECTED_RESULT_KEYS = {
     "risks",
     "requested_evidence",
     "next_codex_actions",
+    "implementation_plan",
+    "patch_draft",
+    "files_changed",
+    "tests_to_run",
+    "ranked_findings",
+    "evidence_references",
+    "disagreements",
+    "confidence",
+    "verification_hints",
+    "analysis_depth",
+    "roles_used",
     "calls_used",
     "cache_hits",
     "model_ids",
+    "prompt_tokens",
+    "completion_tokens",
+    "total_tokens",
+    "estimated_input_chars",
+    "estimated_output_chars",
+    "usage_by_phase",
     "safety_notes",
 }
 
@@ -82,13 +99,14 @@ async def test_service_uses_langgraph_runner_for_debug_loop(tmp_path: Path):
         context="pytest",
         failing_command="pytest",
         file_paths=[],
+        analysis_depth="fast",
     )
 
     assert isinstance(service._graph_runner, DeepLoopGraphRunner)
     assert set(result) == EXPECTED_RESULT_KEYS
     assert result["status"] == "complete"
     assert result["calls_used"] <= 8
-    assert len(client.text_calls) == 3
+    assert len(client.text_calls) == 2
 
 
 @pytest.mark.asyncio
@@ -106,6 +124,7 @@ async def test_graph_runner_routes_debug_loop_to_codex_input(tmp_path: Path):
         context="pytest",
         failing_command="pytest",
         file_paths=[],
+        analysis_depth="fast",
     )
 
     assert result["status"] == "needs_codex_input"
@@ -127,16 +146,26 @@ async def test_graph_runner_chunks_diff_and_preserves_cache_metadata(tmp_path: P
     service = make_service(tmp_path, client)
     diff = "\n".join([f"+line {index}" for index in range(160)])
 
-    first = await service.deep_diff_review(diff=diff, context="PR review", file_paths=[])
-    second = await service.deep_diff_review(diff=diff, context="PR review", file_paths=[])
+    first = await service.deep_diff_review(
+        diff=diff,
+        context="PR review",
+        file_paths=[],
+        analysis_depth="fast",
+    )
+    second = await service.deep_diff_review(
+        diff=diff,
+        context="PR review",
+        file_paths=[],
+        analysis_depth="fast",
+    )
 
     assert set(first) == EXPECTED_RESULT_KEYS
     assert first["status"] == "complete"
-    assert first["calls_used"] == 4
-    assert second["cache_hits"] == 4
+    assert first["calls_used"] == 3
+    assert second["cache_hits"] == 3
     assert second["calls_used"] == 0
     assert "PR review" not in str(second["cache_hits"])
-    assert len(client.text_calls) == 4
+    assert len(client.text_calls) == 3
 
 
 @pytest.mark.asyncio
@@ -157,6 +186,7 @@ async def test_graph_runner_repo_map_reads_allowed_files(tmp_path: Path):
         file_paths=["src/service.py"],
         file_tree="src/service.py",
         context="pytest",
+        analysis_depth="fast",
     )
 
     assert result["status"] == "complete"

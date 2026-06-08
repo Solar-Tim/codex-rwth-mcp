@@ -11,11 +11,12 @@ final reasoning in Codex.
 ```mermaid
 flowchart LR
     Codex["GPT-5 Codex"] -->|"MCP tool call"| MCP["MCP Transport\nFastMCP stdio"]
-    MCP --> Tools["Tool Definitions\nsummarize_*\nanalyze_screenshot\ndeep_*_loop"]
+    MCP --> Tools["Tool Definitions\nsummarize_*\nanalyze_screenshot\ndeep_*_loop\ncoding_task_loop\nusage_report"]
     Tools --> Service["Tool Service\nstable MCP facade"]
-    Service --> Graph["LangGraph Runner\nbounded map/critic/final phases"]
+    Service --> Graph["LangGraph Runner\nrole fanout + synthesize/critic phases"]
     Graph --> Evidence["File Evidence Loader\nrepo-root guarded reads"]
     Graph --> Cache["Response Cache\ncontent-hash metadata"]
+    Graph --> Usage["Usage Ledger\nredaction-safe JSONL"]
     Service --> Router["Model Router\nconfig-driven route choice"]
     Router --> Config["routing.yaml\nmodels + tool routes"]
     Graph --> Service
@@ -54,6 +55,7 @@ codex-rwth-mcp/
     tools.py
     deep_loop.py
     deep_loop_graph.py
+    usage.py
   tests/
     test_config.py
     test_router.py
@@ -69,8 +71,9 @@ Responsibilities:
 - `rwth_client.py`: OpenAI-compatible RWTH chat-completions wrapper.
 - `prompts.py`: prompt templates.
 - `config.py`: YAML parsing and validation.
-- `deep_loop.py`: stable deep-loop service facade, guarded file evidence loading, response caching, and result parsing.
-- `deep_loop_graph.py`: LangGraph orchestration for bounded map/critic/final deep-loop phases.
+- `deep_loop.py`: stable deep-loop service facade, guarded file evidence loading, response caching, usage accounting, and result parsing.
+- `deep_loop_graph.py`: LangGraph orchestration for bounded role fanout, synthesizer/critic phases, and supervised patch drafts.
+- `usage.py`: redaction-safe KiConnect usage event ledger and report aggregation.
 
 ## Detailed Implementation Plan
 
@@ -156,9 +159,19 @@ local deployment surface for Codex.
   private URLs, student IDs, and customer data.
 - Keep Codex as the only layer that edits files or makes final decisions.
 - Deep-loop file reads are constrained to explicitly supplied repo-relative paths,
-  repo-root confinement, secret/binary exclusions, and per-file size caps.
+  current or configured repo-root confinement, secret/binary exclusions, and
+  per-file size caps.
 - LangGraph nodes coordinate only analysis phases and do not edit files, run shell
   commands, or interrupt Codex mid-call.
+- `coding_task_loop` can propose unified diffs, but Codex must apply or rewrite
+  patches and run tests in the active checkout.
+- Deep-loop `analysis_depth` controls bounded KiConnect worker breadth:
+  `fast` is mapper-only, `standard` adds risk finding, `deep` and `exhaustive`
+  use mapper, risk finder, test strategist, and architecture critic roles.
+  `coding_task_loop` is the only tool with a patch drafter role.
+- Usage logging stores metadata only: tool, model, phase, cache status, token
+  usage when available, role, analysis depth, and character estimates. It does
+  not store prompts, evidence, API keys, or raw outputs.
 - Set conservative `tool_timeout_sec` values in Codex config.
 - Log metadata, route names, and durations, but avoid logging raw prompts by default.
 - Pin dependencies in production and run the server in a dedicated virtualenv.
@@ -208,6 +221,7 @@ Not included in MVP:
 
 - Tokenizer-based payload sizing per RWTH model.
 - Additional specialized LangGraph nodes for repo maps, debugging, and diff review.
+- More structured JSON parsing for judged role outputs.
 - Tokenizer-based chunking for very large logs and repositories.
 - Secret/PII redaction pipeline with allow-list overrides.
 - Retry, timeout, and fallback policy per model route.
