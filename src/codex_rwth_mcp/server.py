@@ -10,8 +10,8 @@ from .tools import ToolService
 
 INSTRUCTIONS = """Use this server for high-volume, low-value preprocessing only: log clustering,
 repository/diff summarization, and screenshot diagnostics. Keep code edits,
-architecture decisions, and final reasoning in Codex. Tool routing to RWTH
-models is internal and configuration-driven; do not ask for model names. Use
+architecture decisions, and final reasoning in Codex. Tool routing to configured
+provider models is internal and configuration-driven; do not ask for model names. Use
 deep-loop tools for large debugging, diff review, and repository mapping tasks;
 if they return needs_codex_input, gather the requested evidence and call again."""
 
@@ -117,7 +117,7 @@ def create_mcp_server():
             "Optional analysis depth: fast, standard, deep, or exhaustive. Defaults to deep for quality.",
         ] = "deep",
     ) -> dict:
-        """Run a bounded KiConnect debugging loop and return a Codex handoff or evidence requests."""
+        """Run a bounded provider-backed debugging loop and return a Codex handoff or evidence requests."""
         return await deep_loop_service.deep_debug_loop(
             logs=logs,
             context=context,
@@ -144,7 +144,7 @@ def create_mcp_server():
             "Optional analysis depth: fast, standard, deep, or exhaustive. Defaults to deep for quality.",
         ] = "deep",
     ) -> dict:
-        """Run a bounded KiConnect diff-review loop with chunking, merge, and critic phases."""
+        """Run a bounded provider-backed diff-review loop with chunking, merge, and critic phases."""
         return await deep_loop_service.deep_diff_review(
             diff=diff,
             context=context,
@@ -171,7 +171,7 @@ def create_mcp_server():
             "Optional analysis depth: fast, standard, deep, or exhaustive. Defaults to deep for quality.",
         ] = "deep",
     ) -> dict:
-        """Run a bounded KiConnect repository-mapping loop over provided tree and guarded file evidence."""
+        """Run a bounded provider-backed repository-mapping loop over provided tree and guarded file evidence."""
         return await deep_loop_service.repo_map_loop(
             question=question,
             file_paths=file_paths,
@@ -193,7 +193,7 @@ def create_mcp_server():
             "Optional analysis depth: fast, standard, deep, or exhaustive. Defaults to deep for quality.",
         ] = "deep",
     ) -> dict:
-        """Run a bounded KiConnect repository review loop over tree and guarded file evidence."""
+        """Run a bounded provider-backed repository review loop over tree and guarded file evidence."""
         return await deep_loop_service.deep_repo_review_loop(
             question=question,
             file_tree=file_tree,
@@ -215,7 +215,7 @@ def create_mcp_server():
             "Optional analysis depth: fast, standard, deep, or exhaustive. Defaults to deep for quality.",
         ] = "deep",
     ) -> dict:
-        """Run a bounded KiConnect loop that proposes focused test strategy for a change."""
+        """Run a bounded provider-backed loop that proposes focused test strategy for a change."""
         return await deep_loop_service.deep_test_strategy_loop(
             diff=diff,
             failing_tests=failing_tests,
@@ -236,7 +236,7 @@ def create_mcp_server():
             "Optional analysis depth: fast, standard, deep, or exhaustive. Defaults to deep for quality.",
         ] = "deep",
     ) -> dict:
-        """Run a bounded KiConnect architecture critic loop over guarded evidence."""
+        """Run a bounded provider-backed architecture critic loop over guarded evidence."""
         return await deep_loop_service.deep_architecture_critic(
             question=question,
             context=context,
@@ -289,7 +289,7 @@ def create_mcp_server():
         days: Annotated[int, "Number of recent days to include."] = 7,
         group_by: Annotated[str, "Grouping mode: tool or model."] = "tool",
     ) -> dict:
-        """Report local redaction-safe KiConnect call and token usage metadata."""
+        """Report local redaction-safe provider call and token usage metadata."""
         return deep_loop_service.usage_report(days=days, group_by=group_by)
 
     return mcp

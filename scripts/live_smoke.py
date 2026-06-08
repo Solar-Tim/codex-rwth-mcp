@@ -19,7 +19,7 @@ DEFAULT_CONTEXT = "Live smoke test. Return a concise diagnosis."
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run a live KiConnect/RWTH MCP smoke test."
+        description="Run a live OpenAI-compatible provider MCP smoke test."
     )
     parser.add_argument(
         "--config",
@@ -75,7 +75,8 @@ async def run_smoke(*, config_path: Path, logs: str, context: str) -> None:
             + ", ".join(missing_models)
         )
 
-    os.environ["CODEX_RWTH_MCP_CONFIG"] = str(config_path)
+    os.environ["CODEX_DEEP_LOOP_MCP_CONFIG"] = str(config_path)
+    os.environ.setdefault("CODEX_RWTH_MCP_CONFIG", str(config_path))
     create_mcp_server()
     service = create_service()
     result = await service.summarize_logs(logs=logs, context=context)

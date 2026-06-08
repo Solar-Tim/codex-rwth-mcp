@@ -117,11 +117,13 @@ class FileEvidenceLoader:
 
 class JsonResponseCache:
     def __init__(self, cache_dir: Optional[Path] = None):
-        configured = os.getenv("CODEX_RWTH_MCP_CACHE_DIR")
+        configured = os.getenv("CODEX_DEEP_LOOP_MCP_CACHE_DIR") or os.getenv(
+            "CODEX_RWTH_MCP_CACHE_DIR"
+        )
         self._cache_dir = (
             cache_dir
             or (Path(configured).expanduser() if configured else None)
-            or Path.home() / ".cache" / "codex-rwth-mcp"
+            or Path.home() / ".cache" / "codex-deep-loop-mcp"
         )
         self._cache_dir.mkdir(parents=True, exist_ok=True)
 

@@ -49,7 +49,7 @@
     }
   },
   "deep_debug_loop": {
-    "description": "Run a bounded KiConnect debugging loop and return a Codex handoff or evidence requests.",
+    "description": "Run a bounded provider-backed debugging loop and return a Codex handoff or evidence requests.",
     "inputSchema": {
       "type": "object",
       "required": ["logs"],
@@ -65,7 +65,7 @@
     }
   },
   "deep_diff_review": {
-    "description": "Run a bounded KiConnect diff-review loop with chunking, merge, and critic phases.",
+    "description": "Run a bounded provider-backed diff-review loop with chunking, merge, and critic phases.",
     "inputSchema": {
       "type": "object",
       "required": [],
@@ -80,7 +80,7 @@
     }
   },
   "repo_map_loop": {
-    "description": "Run a bounded KiConnect repository-mapping loop over provided tree and guarded file evidence.",
+    "description": "Run a bounded provider-backed repository-mapping loop over provided tree and guarded file evidence.",
     "inputSchema": {
       "type": "object",
       "required": ["question"],
@@ -96,7 +96,7 @@
     }
   },
   "deep_repo_review_loop": {
-    "description": "Run a bounded KiConnect repository review loop over tree and guarded file evidence.",
+    "description": "Run a bounded provider-backed repository review loop over tree and guarded file evidence.",
     "inputSchema": {
       "type": "object",
       "required": ["question"],
@@ -112,7 +112,7 @@
     }
   },
   "deep_test_strategy_loop": {
-    "description": "Run a bounded KiConnect loop that proposes focused test strategy for a change.",
+    "description": "Run a bounded provider-backed loop that proposes focused test strategy for a change.",
     "inputSchema": {
       "type": "object",
       "required": [],
@@ -128,7 +128,7 @@
     }
   },
   "deep_architecture_critic": {
-    "description": "Run a bounded KiConnect architecture critic loop over guarded evidence.",
+    "description": "Run a bounded provider-backed architecture critic loop over guarded evidence.",
     "inputSchema": {
       "type": "object",
       "required": ["question"],
@@ -174,7 +174,7 @@
     }
   },
   "usage_report": {
-    "description": "Report local redaction-safe KiConnect call and token usage metadata.",
+    "description": "Report local redaction-safe provider call and token usage metadata.",
     "inputSchema": {
       "type": "object",
       "required": [],

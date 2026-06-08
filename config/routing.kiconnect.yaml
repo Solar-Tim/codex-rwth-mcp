@@ -1,4 +1,4 @@
-server_name: codex-rwth-mcp
+server_name: codex-deep-loop-mcp
 
 rwth:
   base_url: https://chat.kiconnect.nrw/api/v1

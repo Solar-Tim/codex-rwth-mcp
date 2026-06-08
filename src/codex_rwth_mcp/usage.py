@@ -69,11 +69,13 @@ class CompletionResult:
 
 class UsageLedger:
     def __init__(self, path: Optional[Path] = None):
-        configured = os.getenv("CODEX_RWTH_MCP_USAGE_LEDGER")
+        configured = os.getenv("CODEX_DEEP_LOOP_MCP_USAGE_LEDGER") or os.getenv(
+            "CODEX_RWTH_MCP_USAGE_LEDGER"
+        )
         self._path = (
             path
             or (Path(configured).expanduser() if configured else None)
-            or Path.home() / ".cache" / "codex-rwth-mcp" / "usage.jsonl"
+            or Path.home() / ".cache" / "codex-deep-loop-mcp" / "usage.jsonl"
         )
         self._path.parent.mkdir(parents=True, exist_ok=True)
 

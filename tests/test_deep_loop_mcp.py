@@ -56,7 +56,7 @@ tools:
 """,
         encoding="utf-8",
     )
-    monkeypatch.setenv("CODEX_RWTH_MCP_CONFIG", str(config_file))
+    monkeypatch.setenv("CODEX_DEEP_LOOP_MCP_CONFIG", str(config_file))
     monkeypatch.setenv("TEST_KEY", "test-key")
 
     mcp = create_mcp_server()

@@ -93,7 +93,7 @@ class RwthClient:
             from openai import AsyncOpenAI
         except ImportError as exc:
             raise RuntimeError(
-                "openai package is required for live RWTH API calls"
+                "openai package is required for live provider API calls"
             ) from exc
 
         kwargs = {
@@ -110,7 +110,7 @@ def _extract_message(response: Any) -> str:
     try:
         content = response.choices[0].message.content
     except (AttributeError, IndexError) as exc:
-        raise RuntimeError("RWTH response did not include chat message content") from exc
+        raise RuntimeError("provider response did not include chat message content") from exc
     if not content:
-        raise RuntimeError("RWTH response content was empty")
+        raise RuntimeError("provider response content was empty")
     return str(content)

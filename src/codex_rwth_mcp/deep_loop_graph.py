@@ -364,7 +364,7 @@ class DeepLoopGraphRunner:
         }[role]
         return (
             f"role: {role}\n"
-            f"You are a bounded RWTH/KiConnect worker for Codex. {focus}\n"
+            f"You are a bounded configured-provider worker for Codex. {focus}\n"
             "Return colon-prefixed fields where possible: finding, risk, evidence_reference, "
             "verification_hint, disagreement, confidence, requested_evidence. "
             "For patch_drafter, include implementation_plan, patch_draft, files_changed, tests_to_run.\n\n"
@@ -376,7 +376,7 @@ class DeepLoopGraphRunner:
 
     def _synthesizer_prompt(self, tool_name: str, state: DeepLoopState) -> str:
         prompt = (
-            "RWTH synthesizer pass for Codex. Deduplicate, compress, rank, and preserve uncertainty. "
+            "Worker-model synthesizer pass for Codex. Deduplicate, compress, rank, and preserve uncertainty. "
             "Do not invent evidence. Return colon-prefixed fields: status, summary, ranked_finding, "
             "finding, risk, evidence_reference, verification_hint, confidence, requested_evidence, "
             "implementation_plan, patch_draft, files_changed, tests_to_run.\n\n"
@@ -389,7 +389,7 @@ class DeepLoopGraphRunner:
 
     def _critic_prompt(self, tool_name: str, state: DeepLoopState) -> str:
         prompt = (
-            "RWTH critic pass for Codex. Identify unsupported claims, missing evidence, disagreements, "
+            "Worker-model critic pass for Codex. Identify unsupported claims, missing evidence, disagreements, "
             "and overconfident conclusions. Do not make final decisions. Return colon-prefixed fields: "
             "status, summary, risk, disagreement, requested_evidence, verification_hint, confidence.\n\n"
             f"Tool: {tool_name}\n"

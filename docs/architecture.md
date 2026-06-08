@@ -1,10 +1,10 @@
-# Codex RWTH MCP Preprocessor Architecture
+# Codex Deep Loop MCP Architecture
 
 ## Goal
 
-Allow Codex to offload high-volume, low-value analysis to RWTH's
-OpenAI-compatible API while keeping code edits, architectural decisions, and
-final reasoning in Codex.
+Allow Codex to offload high-volume, low-value analysis to configured
+OpenAI-compatible worker models while keeping code edits, shell commands,
+architectural decisions, and final reasoning in Codex.
 
 ## High-Level Architecture
 
@@ -20,20 +20,20 @@ flowchart LR
     Service --> Router["Model Router\nconfig-driven route choice"]
     Router --> Config["routing.yaml\nmodels + tool routes"]
     Graph --> Service
-    Service --> Client["RWTH Client\nOpenAI-compatible chat completions"]
-    Client --> RWTH["RWTH API\ntext + vision models"]
-    RWTH --> Client --> Service --> MCP --> Codex
+    Service --> Client["Provider Client\nOpenAI-compatible chat completions"]
+    Client --> Provider["Configured Provider\ntext + vision models"]
+    Provider --> Client --> Service --> MCP --> Codex
 ```
 
 Codex sees only MCP tool names, descriptions, schemas, and results. It does not
-choose RWTH models or see routing rules. The server instructions tell Codex to
-use the server only for preprocessing and to keep decisions and code edits in
+choose provider models or see routing rules. The server instructions tell Codex
+to use the server only for preprocessing and to keep decisions and code edits in
 Codex.
 
 ## Recommended Project Structure
 
 ```text
-codex-rwth-mcp/
+codex-deep-loop-mcp/
   pyproject.toml
   README.md
   config/
@@ -68,24 +68,24 @@ Responsibilities:
 - `server.py`: MCP transport and tool registration.
 - `tools.py`: tool service API and result shape.
 - `router.py`: deterministic model routing.
-- `rwth_client.py`: OpenAI-compatible RWTH chat-completions wrapper.
+- `rwth_client.py`: OpenAI-compatible chat-completions wrapper. The filename is retained for compatibility with the initial RWTH/KI:connect implementation.
 - `prompts.py`: prompt templates.
 - `config.py`: YAML parsing and validation.
 - `deep_loop.py`: stable deep-loop service facade, guarded file evidence loading, response caching, usage accounting, and result parsing.
 - `deep_loop_graph.py`: LangGraph orchestration for bounded role fanout, synthesizer/critic phases, and supervised patch drafts.
-- `usage.py`: redaction-safe KiConnect usage event ledger and report aggregation.
+- `usage.py`: redaction-safe provider usage event ledger and report aggregation.
 
 ## Detailed Implementation Plan
 
 1. Define MCP-facing tool contracts for logs, repo excerpts, screenshots, and diffs.
-2. Create a YAML config schema for RWTH endpoint, model catalog, and per-tool route rules.
+2. Create a YAML config schema for provider endpoint, model catalog, and per-tool route rules.
 3. Implement config loading with validation for unknown models and invalid vision routes.
 4. Implement deterministic routing by tool, payload size, vision requirement, priority, and cost weight.
-5. Implement an RWTH client around the OpenAI-compatible chat-completions API.
+5. Implement a provider client around the OpenAI-compatible chat-completions API.
 6. Implement prompt builders that force compact, actionable handoff summaries.
 7. Register tools through FastMCP and keep routing hidden behind the service layer.
 8. Add Codex config examples for stdio MCP setup.
-9. Add unit tests with fake clients so CI never calls RWTH.
+9. Add unit tests with fake clients so CI never calls live providers.
 10. Add future hardening around truncation, PII redaction, observability, and retries.
 
 ## Model-Routing Strategy
@@ -140,8 +140,8 @@ Codex can run this as a stdio MCP server. Use the example in
 `examples/codex.config.toml` or the CLI:
 
 ```bash
-codex mcp add codex_rwth \
-  --env CODEX_RWTH_MCP_CONFIG=/absolute/path/to/config/routing.yaml \
+codex mcp add codex_deep_loop \
+  --env CODEX_DEEP_LOOP_MCP_CONFIG=/absolute/path/to/config/routing.yaml \
   --env RWTH_OPENAI_API_KEY="$RWTH_OPENAI_API_KEY" \
   -- python -m codex_rwth_mcp
 ```
@@ -153,7 +153,7 @@ local deployment surface for Codex.
 
 ## Security Considerations
 
-- Keep `RWTH_OPENAI_API_KEY` in the environment or a secret manager, not in git.
+- Keep provider API keys in the environment or a secret manager, not in git.
 - Treat logs, diffs, repo excerpts, and screenshots as potentially sensitive.
 - Add a redaction middleware before production use for secrets, tokens, emails,
   private URLs, student IDs, and customer data.
@@ -165,7 +165,7 @@ local deployment surface for Codex.
   commands, or interrupt Codex mid-call.
 - `coding_task_loop` can propose unified diffs, but Codex must apply or rewrite
   patches and run tests in the active checkout.
-- Deep-loop `analysis_depth` controls bounded KiConnect worker breadth:
+- Deep-loop `analysis_depth` controls bounded worker-model breadth:
   `fast` is mapper-only, `standard` adds risk finding, `deep` and `exhaustive`
   use mapper, risk finder, test strategist, and architecture critic roles.
   `coding_task_loop` is the only tool with a patch drafter role.
@@ -177,6 +177,9 @@ local deployment surface for Codex.
 - Pin dependencies in production and run the server in a dedicated virtualenv.
 - Prefer user-level Codex MCP config for secrets; project config is fine for
   non-secret paths in trusted repos.
+- KI:connect usage is governed by the KI:connect terms of use and institutional
+  authorization. Configure another compliant OpenAI-compatible provider for
+  private, commercial, or otherwise non-covered use cases.
 
 ## Step-by-Step Build Order
 
@@ -203,14 +206,14 @@ Included:
 - Four requested MCP tools.
 - Config-driven model catalog and routing.
 - Hidden model-selection logic.
-- OpenAI-compatible RWTH chat-completions client.
+- OpenAI-compatible chat-completions client.
 - Vision payload support for screenshots.
 - Unit tests for config, routing, client payloads, and tool service behavior.
 - Documentation and configuration examples.
 
 Not included in MVP:
 
-- Live RWTH integration test, because it requires real credentials and endpoint details.
+- Live provider integration test, because it requires real credentials and endpoint details.
 - Token-aware chunking; routing currently uses character counts as a stable proxy.
 - Automatic redaction.
 - Retries/backoff and circuit breaking.
@@ -219,7 +222,7 @@ Not included in MVP:
 
 ## Future Enhancements
 
-- Tokenizer-based payload sizing per RWTH model.
+- Tokenizer-based payload sizing per model/provider.
 - Additional specialized LangGraph nodes for repo maps, debugging, and diff review.
 - More structured JSON parsing for judged role outputs.
 - Tokenizer-based chunking for very large logs and repositories.

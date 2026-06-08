@@ -46,12 +46,14 @@ class AppConfig:
     rwth: RwthConfig
     models: Dict[str, ModelConfig]
     tools: Dict[str, ToolConfig]
-    server_name: str = "codex-rwth-mcp"
+    server_name: str = "codex-deep-loop-mcp"
     repo_roots: Dict[str, Path] = field(default_factory=dict)
 
 
 def default_config_path() -> Path:
-    configured = os.getenv("CODEX_RWTH_MCP_CONFIG")
+    configured = os.getenv("CODEX_DEEP_LOOP_MCP_CONFIG") or os.getenv(
+        "CODEX_RWTH_MCP_CONFIG"
+    )
     if configured:
         return Path(configured).expanduser()
     return Path("config/routing.yaml")
@@ -116,7 +118,7 @@ def _parse_config(raw: Dict[str, Any]) -> AppConfig:
         ),
         models=models,
         tools=tools,
-        server_name=str(raw.get("server_name", "codex-rwth-mcp")),
+        server_name=str(raw.get("server_name", "codex-deep-loop-mcp")),
         repo_roots={
             str(name): Path(str(path)).expanduser()
             for name, path in (raw.get("repo_roots", {}) or {}).items()

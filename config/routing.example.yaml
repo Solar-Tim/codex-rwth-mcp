@@ -1,4 +1,4 @@
-server_name: codex-rwth-mcp
+server_name: codex-deep-loop-mcp
 
 # Optional allowlist for multi-repo guarded file evidence. Tool inputs may use
 # repo_root: example_repo, but arbitrary absolute paths are rejected.
